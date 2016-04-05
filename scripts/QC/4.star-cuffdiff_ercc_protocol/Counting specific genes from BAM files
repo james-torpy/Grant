@@ -1,0 +1,35 @@
+Counting specific genes from BAM files using R:
+
+1. Loading BAM file:
+
+library(GenomicRanges)
+library(ShortRead)
+library(rtracklayer)
+library("BSgenome.Hsapiens.UCSC.hg38")
+library(BSgenome)
+
+1.Extract chromosome lengths for chromosomes which are not the assemblies (those contain “_”):
+
+chrs=seqlengths(Hsapiens)[!grepl("_",names(seqlengths(Hsapiens)))]
+
+2.Define the object “gr” which is a GRanges object containing the start and the end numbers of bases of all the chromosomes:, this information is labelled by chromosome name i.e. chr1, chr2 etc..
+The GRanges object consists of IRanges objects which have the sequence ranges in base number for the start and end of each of chromosome, and the corresponding names of each chromosome
+
+seq_lengths=seqlengths(Hsapiens)
+ranges_vector=c( IRanges(start=1, end=(seq_lengths[1])), IRanges(start=1, end=(seq_lengths[2])), IRanges(start=1, end=(seq_lengths[3])), IRanges(start=1, end=(seq_lengths[4])), IRanges(start=1, end=(seq_lengths[5])), IRanges(start=1, end=(seq_lengths[6])), IRanges(start=1, end=(seq_lengths[7])), IRanges(start=1, end=(seq_lengths[8])), IRanges(start=1, end=(seq_lengths[9])), IRanges(start=1, end=(seq_lengths[10])), IRanges(start=1, end=(seq_lengths[11])), IRanges(start=1, end=(seq_lengths[12])), IRanges(start=1, end=(seq_lengths[13])), IRanges(start=1, end=(seq_lengths[14])), IRanges(start=1, end=(seq_lengths[15])), IRanges(start=1, end=(seq_lengths[16])), IRanges(start=1, end=(seq_lengths[17])), IRanges(start=1, end=(seq_lengths[18])), IRanges(start=1, end=(seq_lengths[19])), IRanges(start=1, end=(seq_lengths[20])), IRanges(start=1, end=(seq_lengths[21])), IRanges(start=1, end=(seq_lengths[22])), IRanges(start=1, end=(seq_lengths[23])), IRanges(start=1, end=(seq_lengths[24])), IRanges(start=1, end=(seq_lengths[25])) )
+gr = GRanges(seqnames=chrs, ranges=ranges_vector)
+
+#assign column names for dataframe:
+what = c("rname","strand","pos","qwidth")
+
+#flag unmapped sequences to leave out:
+flag = scanBamFlag(isUnmappedQuery=FALSE)
+#define parameters of bam scan:
+param = ScanBamParam(what=what, flag=flag)
+
+#index the inFile - file with your mapped library in bam format:
+indexBam("/Users/jamestorpy/clusterHome/projects/Grant/results/4.star-cuffdiff_ercc_protocol/samples.star/sample_casep_R1/sample_casep_R1.Sorted_Aligned.out.bam")
+#define the inFile:
+bam=scanBam("/Users/jamestorpy/clusterHome/projects/Grant/results/4.star-cuffdiff_ercc_protocol/samples.star/sample_casep_R1/sample_casep_R1.Sorted_Aligned.out.bam",param=param)
+
+#This creates a list within a list for the object 'bam' - the former list is a list of one single variable [1], the latter list is the list of values subsetted into rname, strand, pos, qwidth
