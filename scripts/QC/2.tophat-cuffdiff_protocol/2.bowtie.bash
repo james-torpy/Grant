@@ -8,10 +8,10 @@ module load gi/samtools/1.2
 numcores=8
 
 #genome directories
-genomeName="GRCh37_iGenome"
+genomeName="hg38_ercc"
 
-homeDir="/home/jamtor/"
-genomeDir="$homeDir/genomes/Homo_sapiens/Ensembl/GRCh37/GenomeFasta/"
+homeDir="/home/jamtor"
+genomeDir="$homeDir/genomes/$genomeName"
 genomeFile="$genomeDir/$genomeName.fa"
 bowtie_indexPath="$homeDir/genomes/Homo_sapiens/Ensembl/GRCh37/GenomeFasta/"
 
@@ -35,13 +35,13 @@ echo $logDir
 echo -e
 
 #generate the bowtie 2 index files:
-bowtie_line="bowtie2-build $genomeFile"
+bowtie_line="bowtie2-build $genomeFile $genomeName"
 
 echo This is the bowtie_line:
 echo $bowtie_line
 
 #submit job with name 'BOWTIE_build_$genomeName' to 10 cluster cores:
-qsub -N BOWTIE_build_$genomeName -wd $outDir -b y -cwd -j y -R y -pe smp $numcores -V $bowtie_line
+qsub -N btbld_$genomeName -wd $logDir -b y -cwd -j y -R y -pe smp $numcores -V $bowtie_line
 
 #move log files to logDir:
 move_line=mv *$genomeDir/$genomeName.o* $logDir
